@@ -1,0 +1,7 @@
+- [ ] Simplify the information architecture into a compact clickable tree.
+- [ ] Define reusable wireframe templates and page-specific content data.
+- [ ] Demonstrate a multi-fund cart with one donor-selected payment method per checkout.
+- [ ] Make donation and fund-opening wireframes explicitly mobile-first.
+- [ ] Build a page-node modal with wireframe previews for every page.
+- [ ] Validate desktop and mobile interactions and production build.
+- [ ] Save a checkpoint and publish the source to a private GitHub repository.

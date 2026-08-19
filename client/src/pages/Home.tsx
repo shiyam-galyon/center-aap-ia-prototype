@@ -1,666 +1,344 @@
 /**
- * Design: Civic Cartography — a navigable information architecture, composed as
- * route rails, waypoints, and editorial detail rather than a generic dashboard.
+ * Design: Minimal IA Prototype — a restrained clickable tree with low-fidelity,
+ * mobile-first wireframe pop-ups for page templates and transactional flows.
  */
 import { useMemo, useState } from "react";
 import {
-  ArrowDownRight,
-  ArrowUpRight,
-  BookOpen,
   ChevronDown,
   ChevronRight,
-  CircleDollarSign,
-  Compass,
+  CircleDot,
+  CreditCard,
+  ExternalLink,
   FileText,
-  HandHeart,
-  Landmark,
-  LayoutTemplate,
-  Map,
-  Maximize2,
-  MousePointer2,
   Search,
-  Sparkles,
-  Ticket,
-  UsersRound,
+  Smartphone,
+  MapPinned,
+  TabletSmartphone,
   X,
 } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
-type JourneyId = "learn" | "open" | "donate" | "apply" | "attend" | "contact";
-type NodeKind = "Hub" | "Template" | "Archive" | "Flow" | "Utility";
+type TemplateKey =
+  | "home"
+  | "hub"
+  | "standard"
+  | "people"
+  | "documents"
+  | "directory"
+  | "fund"
+  | "cart"
+  | "checkout"
+  | "confirmation"
+  | "service"
+  | "form"
+  | "opportunity"
+  | "events"
+  | "event";
 
-type SiteNode = {
+type NodeKind = "Page" | "Template" | "Flow";
+
+type PageNode = {
   id: string;
-  title: string;
+  label: string;
   kind: NodeKind;
-  template: string;
+  template: TemplateKey;
   description: string;
-  examples: string[];
-  pageCount: string;
-  notes?: string;
+  clientCopy?: string;
+  children?: PageNode[];
 };
 
-type Journey = {
-  id: JourneyId;
-  name: string;
-  color: string;
-  softColor: string;
-  glyph: string;
-  description: string;
-  icon: typeof BookOpen;
-  nodes: SiteNode[];
-};
-
-const journeys: Journey[] = [
+const tree: PageNode[] = [
+  {
+    id: "home",
+    label: "Home",
+    kind: "Page",
+    template: "home",
+    description: "Mission-led front door that routes visitors into Learn, Open, Donate, Apply, Attend, or Contact.",
+    clientCopy:
+      "Ahlan wa Sahlan. Welcome. We are so glad you are here. The Center for Arab American Philanthropy (CAAP) is the nation’s only Arab American community foundation.",
+  },
   {
     id: "learn",
-    name: "Learn",
-    glyph: "01",
-    color: "#1F5E6B",
-    softColor: "#DFEAEC",
-    description: "Build trust through CAAP’s mission, people, record, and stories of impact.",
-    icon: BookOpen,
-    nodes: [
-      {
-        id: "learn-hub",
-        title: "Learn About CAAP",
-        kind: "Hub",
-        template: "Section landing / action hub",
-        description: "The orientation point for CAAP’s purpose, proof, and institutional knowledge.",
-        examples: ["About CAAP", "Mission & approach", "Impact overview"],
-        pageCount: "1 landing page",
-      },
-      {
-        id: "editorial",
-        title: "Institutional Pages",
-        kind: "Template",
-        template: "Standard editorial page",
-        description: "Flexible long-form pages with a governed set of narrative, media, and call-to-action modules.",
-        examples: ["Our History", "Policies", "Evergreen explanatory pages"],
-        pageCount: "Reusable across many pages",
-      },
-      {
-        id: "people",
-        title: "People & Governance",
-        kind: "Template",
-        template: "People directory + profile",
-        description: "A structured way to show staff, advisory board members, and individual biographies.",
-        examples: ["Our Staff", "Our Advisory Board", "Individual profiles"],
-        pageCount: "2 directories + profiles",
-      },
-      {
-        id: "resources",
-        title: "Reports & Resources",
-        kind: "Archive",
-        template: "Document / report library",
-        description: "A categorized library for financial reports, research, policies, and downloadable resources.",
-        examples: ["Annual reports", "Financials", "Policies"],
-        pageCount: "1 archive + documents",
-      },
-      {
-        id: "stories",
-        title: "Stories & News",
-        kind: "Archive",
-        template: "Article archive + detail",
-        description: "The durable editorial home for news, grant outcomes, fund stories, and institutional updates.",
-        examples: ["News & Blog", "Impact stories", "Individual articles"],
-        pageCount: "1 archive + articles",
-      },
+    label: "Learn",
+    kind: "Page",
+    template: "hub",
+    description: "The institutional learning hub for CAAP’s history, people, reports, and stories.",
+    children: [
+      { id: "about", label: "About CAAP", kind: "Page", template: "standard", description: "Mission, approach, and institutional overview.", clientCopy: "CAAP offers the tools for your charitable giving and the relationship to nurture your philanthropic ambitions." },
+      { id: "history", label: "Our History", kind: "Page", template: "standard", description: "CAAP’s history and development." },
+      { id: "staff", label: "Our Staff", kind: "Page", template: "people", description: "Structured staff directory and individual profiles." },
+      { id: "board", label: "Our Advisory Board", kind: "Page", template: "people", description: "Advisory board directory and individual profiles." },
+      { id: "reports", label: "Reports & Resources", kind: "Page", template: "documents", description: "Downloadable reports, policies, research, and documents." },
+      { id: "stories", label: "Stories & News", kind: "Page", template: "directory", description: "Archive for grant outcomes, fund stories, and institutional news." },
     ],
   },
   {
     id: "open",
-    name: "Open",
-    glyph: "02",
-    color: "#9A6237",
-    softColor: "#F2E6DA",
-    description: "Help prospective fundholders understand choices, begin a relationship, and take the next step.",
-    icon: Landmark,
-    nodes: [
-      {
-        id: "open-hub",
-        title: "Open a Fund",
-        kind: "Hub",
-        template: "Section landing / action hub",
-        description: "The first decision point for prospective fundholders, with clear pathways into the right fund type.",
-        examples: ["Open a Fund", "Fund type overview"],
-        pageCount: "1 landing page",
-      },
-      {
-        id: "fund-types",
-        title: "Fund Type Pages",
-        kind: "Template",
-        template: "Fund-type / service detail",
-        description: "A reusable service explanation that helps visitors compare options and understand the next action.",
-        examples: ["Donor Advised Fund", "Impact Area Fund", "Endowed Fund", "Scholarship Fund"],
-        pageCount: "4 primary pages",
-      },
-      {
-        id: "fund-inquiry",
-        title: "Fund-Opening Inquiry",
-        kind: "Flow",
-        template: "Decision support + routed inquiry",
-        description: "A guided handoff into staff conversation, a form, or a more complete application pathway.",
-        examples: ["Which fund is right for me?", "Fund-opening inquiry", "Staff next steps"],
-        pageCount: "1 guided flow",
-        notes: "The operational meaning of ‘Open’ determines whether this remains a form or becomes a self-service portal.",
-      },
-      {
-        id: "fund-application",
-        title: "Application & Confirmation",
-        kind: "Flow",
-        template: "Application / external portal",
-        description: "An optional application surface for agreement, e-signature, and initial-funding steps.",
-        examples: ["Applicant data", "Agreement handoff", "Application confirmation"],
-        pageCount: "Only if required",
-      },
+    label: "Open a Fund",
+    kind: "Page",
+    template: "hub",
+    description: "Decision hub for prospective fundholders, from education through inquiry or application.",
+    children: [
+      { id: "daf", label: "Donor Advised Fund", kind: "Page", template: "service", description: "Explains the donor-advised fund option and its next step." },
+      { id: "impact-fund", label: "Impact Area Fund", kind: "Page", template: "service", description: "Explains a fund focused on a shared issue or community need." },
+      { id: "endowed-fund", label: "Endowed Fund", kind: "Page", template: "service", description: "Explains long-term endowed giving and fund stewardship." },
+      { id: "scholarship-fund", label: "Scholarship Fund", kind: "Page", template: "service", description: "Explains how to create a scholarship fund with CAAP." },
+      { id: "fund-inquiry", label: "Fund-Opening Inquiry", kind: "Flow", template: "form", description: "Mobile-first guided inquiry that routes a prospective fundholder to CAAP staff." },
     ],
   },
   {
     id: "donate",
-    name: "Donate",
-    glyph: "03",
-    color: "#AD7144",
-    softColor: "#F7E5D6",
-    description: "Guide donors from a cause or fund discovery moment into a precise, designated gift.",
-    icon: HandHeart,
-    nodes: [
-      {
-        id: "donate-hub",
-        title: "Donate to a Cause",
-        kind: "Hub",
-        template: "Section landing / discovery hub",
-        description: "A route into featured funds, themes, general giving, and the full fund search experience.",
-        examples: ["Featured funds", "Giving themes", "General CAAP donation"],
-        pageCount: "1 landing page",
-      },
-      {
-        id: "fund-directory",
-        title: "Fund Discovery",
-        kind: "Archive",
-        template: "Fund directory / search results",
-        description: "A specialized discovery interface for keyword search, A–Z browsing, featured funds, and rich filtering.",
-        examples: ["All funds", "Featured funds", "A–Z browse", "Filtered results"],
-        pageCount: "1 dynamic archive",
-        notes: "Mission, beneficiary, geography, and fund type should be structured taxonomies—not manually written category pages.",
-      },
-      {
-        id: "fund-detail",
-        title: "Individual Fund",
-        kind: "Template",
-        template: "Fund detail",
-        description: "The storytelling and giving page for every active fund, combining context, media, metadata, and donation action.",
-        examples: ["Palestine Museum US Fund", "Shaheen Media Scholarship", "Teen Grantmaking Initiative"],
-        pageCount: "One template, many funds",
-      },
-      {
-        id: "giving-cart",
-        title: "Giving Cart & Checkout",
-        kind: "Flow",
-        template: "Donation amount + cart + checkout",
-        description: "A transactional surface for single- or multi-fund gifts, donor details, payment selection, fee logic, and receipt data.",
-        examples: ["Add to cart", "Multi-fund basket", "Payment & tax acknowledgement"],
-        pageCount: "One connected application flow",
-        notes: "This is not a typical page template. It needs fund-level designation, payment, receipt, and finance-reconciliation rules.",
-      },
-      {
-        id: "donation-confirmation",
-        title: "Gift Acknowledgement",
-        kind: "Utility",
-        template: "Donation confirmation / receipt",
-        description: "The post-payment acknowledgement experience, paired with email receipt and optional social-sharing prompt.",
-        examples: ["On-screen confirmation", "Tax acknowledgement", "Social share"],
-        pageCount: "1 confirmation state",
-      },
+    label: "Donate",
+    kind: "Page",
+    template: "hub",
+    description: "Fund discovery, individual fund storytelling, and designated giving.",
+    children: [
+      { id: "fund-discovery", label: "Find a Fund", kind: "Page", template: "directory", description: "Search and filter active funds by mission, beneficiary, geography, and type." },
+      { id: "fund-detail", label: "Palestine Museum US Fund", kind: "Template", template: "fund", description: "Representative individual-fund page for narrative, media, metadata, and a giving action.", clientCopy: "The Palestine Museum US is an arts and craft museum based in Connecticut and Edinburgh, run entirely by volunteers." },
+      { id: "gift-cart", label: "Multi-Fund Gift Cart", kind: "Flow", template: "cart", description: "A single cart retaining a donor’s selected fund designations, amounts, and notes." },
+      { id: "donation-checkout", label: "Donation Checkout", kind: "Flow", template: "checkout", description: "A mobile-first checkout where one donor-selected payment method completes the total cart." },
+      { id: "gift-confirmation", label: "Gift Confirmation", kind: "Flow", template: "confirmation", description: "On-screen acknowledgement and formal email receipt after the transaction." },
     ],
   },
   {
     id: "apply",
-    name: "Apply",
-    glyph: "04",
-    color: "#58745F",
-    softColor: "#E0EADD",
-    description: "Make grants, scholarships, programs, and fellowships understandable and actionable.",
-    icon: Sparkles,
-    nodes: [
-      {
-        id: "apply-hub",
-        title: "Apply for an Opportunity",
-        kind: "Hub",
-        template: "Section landing / action hub",
-        description: "The entry point for people seeking a current grant, scholarship, program, or fellowship opportunity.",
-        examples: ["Current opportunities", "Application guidance"],
-        pageCount: "1 landing page",
-      },
-      {
-        id: "opportunity-directory",
-        title: "Opportunity Explorer",
-        kind: "Archive",
-        template: "Opportunity directory",
-        description: "A clear archive of all opportunities, sortable or grouped by type, status, eligibility, and deadline.",
-        examples: ["Grants", "Scholarships", "Programs", "Fellowships"],
-        pageCount: "1 dynamic archive",
-      },
-      {
-        id: "opportunity-detail",
-        title: "Individual Opportunity",
-        kind: "Template",
-        template: "Opportunity detail",
-        description: "A shared structure for eligibility, requirements, deadlines, award information, FAQs, and an application action.",
-        examples: ["Grant opportunity", "Scholarship opportunity", "Teen Grantmaking Initiative", "Emerging Philanthropist Fellowship"],
-        pageCount: "One template, many opportunities",
-      },
-      {
-        id: "application-flow",
-        title: "Application Flow",
-        kind: "Flow",
-        template: "Application form / external portal",
-        description: "The controlled application workflow and its post-submission next steps.",
-        examples: ["Application form", "External portal", "Confirmation"],
-        pageCount: "One or more application flows",
-      },
+    label: "Apply",
+    kind: "Page",
+    template: "hub",
+    description: "Current opportunities for grants, scholarships, programs, and fellowships.",
+    children: [
+      { id: "grants", label: "Grants", kind: "Page", template: "opportunity", description: "Individual grant opportunity template with status, eligibility, requirements, and application CTA." },
+      { id: "scholarships", label: "Scholarships", kind: "Page", template: "opportunity", description: "Individual scholarship opportunity template with status, eligibility, and application CTA." },
+      { id: "programs", label: "Programs", kind: "Page", template: "opportunity", description: "Program overview and participation or application pathway." },
+      { id: "teen-grantmaking", label: "Teen Grantmaking Initiative", kind: "Page", template: "opportunity", description: "Featured initiative built from the opportunity template." },
+      { id: "fellowship", label: "Emerging Philanthropist Fellowship", kind: "Page", template: "opportunity", description: "Featured fellowship built from the opportunity template." },
     ],
   },
   {
     id: "attend",
-    name: "Attend",
-    glyph: "05",
-    color: "#665C83",
-    softColor: "#E9E4F0",
-    description: "Give event visitors a clean path from discovery to registration, tickets, sponsorship, or follow-up.",
-    icon: Ticket,
-    nodes: [
-      {
-        id: "attend-hub",
-        title: "Attend an Event",
-        kind: "Hub",
-        template: "Section landing / event hub",
-        description: "A high-level invitation into CAAP’s current and signature event experiences.",
-        examples: ["Upcoming events", "Signature event brands"],
-        pageCount: "1 landing page",
-      },
-      {
-        id: "event-calendar",
-        title: "Event Calendar",
-        kind: "Archive",
-        template: "Event listing / calendar",
-        description: "A chronological source of truth for upcoming and past events, with series or type filters where useful.",
-        examples: ["Upcoming events", "Past events", "Event-type filters"],
-        pageCount: "1 dynamic archive",
-      },
-      {
-        id: "event-series",
-        title: "Signature Event Series",
-        kind: "Template",
-        template: "Event series",
-        description: "An evergreen home for recurring, branded event experiences that connects their past and future editions.",
-        examples: ["Threads of Giving Gala", "100 Arab Americans", "Director’s Table Series"],
-        pageCount: "Optional, for recurring brands",
-      },
-      {
-        id: "event-detail",
-        title: "Individual Event",
-        kind: "Template",
-        template: "Event detail",
-        description: "A structured dated-event page for agenda, location, speakers, tickets, sponsorships, and attendee logistics.",
-        examples: ["Threads of Giving Gala 2026", "100 Arab Americans event", "Director’s Table date"],
-        pageCount: "One template, many events",
-      },
-      {
-        id: "event-registration",
-        title: "Registration & Tickets",
-        kind: "Flow",
-        template: "Event registration / ticketing",
-        description: "A separate event transaction that carries attendee, ticket, sponsorship, and payment data—not just a donation.",
-        examples: ["Ticket selection", "Sponsorship choice", "Registration confirmation"],
-        pageCount: "One or more event flows",
-      },
+    label: "Attend",
+    kind: "Page",
+    template: "hub",
+    description: "Event discovery, event details, ticketing, sponsorship, and confirmation.",
+    children: [
+      { id: "events", label: "Events Calendar", kind: "Page", template: "events", description: "Upcoming and past events in a date-led directory." },
+      { id: "gala", label: "Threads of Giving Gala 2026", kind: "Template", template: "event", description: "Representative event page with event details, ticket or sponsorship selection, and registration CTA." },
+      { id: "arab-americans", label: "100 Arab Americans", kind: "Page", template: "event", description: "Individual event page using the same structured event template." },
+      { id: "directors-table", label: "Director’s Table Series", kind: "Page", template: "event", description: "Event-series page linking upcoming and past dates." },
     ],
   },
   {
     id: "contact",
-    name: "Contact",
-    glyph: "06",
-    color: "#7E6047",
-    softColor: "#F0E4DA",
-    description: "Turn broad interest into a well-routed conversation with the correct CAAP team or next step.",
-    icon: UsersRound,
-    nodes: [
-      {
-        id: "contact-hub",
-        title: "Contact CAAP",
-        kind: "Hub",
-        template: "Contact / relationship routing",
-        description: "A focused relationship page that makes it easy to choose the appropriate contact path.",
-        examples: ["General contact", "Department routing", "Contact information"],
-        pageCount: "1 landing page",
-      },
-      {
-        id: "inquiry-form",
-        title: "Routed Inquiry Forms",
-        kind: "Template",
-        template: "Contextual contact form",
-        description: "A configurable form structure that can route questions based on purpose and capture only necessary details.",
-        examples: ["General contact", "Fund-opening inquiry", "Partnership or media inquiry"],
-        pageCount: "One template, multiple contexts",
-      },
-      {
-        id: "contact-confirmation",
-        title: "Contact Confirmation",
-        kind: "Utility",
-        template: "Form confirmation",
-        description: "A clear acknowledgement state that sets expectations and confirms the inquiry route.",
-        examples: ["Thank-you message", "Expected-response language"],
-        pageCount: "1 reusable state",
-      },
-    ],
+    label: "Contact",
+    kind: "Page",
+    template: "form",
+    description: "Relationship-routing contact page with general, fund-opening, and partnership inquiry paths.",
   },
 ];
 
-const foundations: SiteNode[] = [
-  {
-    id: "global-shell",
-    title: "Global Site Shell",
-    kind: "Template",
-    template: "Shared site foundation",
-    description: "The consistent frame for every public page: header, navigation, utility actions, breadcrumbs, footer, alerts, and the visual language for calls to action.",
-    examples: ["Primary navigation", "Donate / Login utilities", "Footer", "Mobile menu"],
-    pageCount: "Used on every page",
-  },
-  {
-    id: "component-system",
-    title: "Reusable Components",
-    kind: "Template",
-    template: "Modular content system",
-    description: "The cards and modules that make every template flexible without turning each page into a bespoke build.",
-    examples: ["Hero", "CTA band", "Quote", "Metrics", "Media", "FAQ", "Related content"],
-    pageCount: "Used across all templates",
-  },
-  {
-    id: "utility-pages",
-    title: "Utility Surfaces",
-    kind: "Utility",
-    template: "System pages",
-    description: "The quiet but necessary pages that maintain continuity, findability, and compliance across the site.",
-    examples: ["Search results", "404 / not found", "Privacy", "Accessibility", "Generic confirmation"],
-    pageCount: "Shared system states",
-  },
-];
-
-const typeStyles: Record<NodeKind, { foreground: string; background: string }> = {
-  Hub: { foreground: "#1F5E6B", background: "#DCEBED" },
-  Template: { foreground: "#4E514C", background: "#EBEBDD" },
-  Archive: { foreground: "#6A5C7E", background: "#EAE5F0" },
-  Flow: { foreground: "#9A563B", background: "#F5E0D6" },
-  Utility: { foreground: "#6B625B", background: "#ECE8E1" },
+const routeMeta: Record<string, { color: string; soft: string; summary: string }> = {
+  learn: { color: "#1F5E6B", soft: "#DFEAEC", summary: "Mission, people, reports, stories" },
+  open: { color: "#A87931", soft: "#F5E7CF", summary: "Fund types and inquiry" },
+  donate: { color: "#B85C47", soft: "#F4E1DB", summary: "Fund discovery and giving" },
+  apply: { color: "#58745F", soft: "#E0EBDD", summary: "Grants, scholarships, programs" },
+  attend: { color: "#665C83", soft: "#EAE5F0", summary: "Events, tickets, sponsorships" },
+  contact: { color: "#556C78", soft: "#E2EBEE", summary: "Relationship routing" },
 };
 
-function NodeCard({
-  node,
-  accent,
-  selected,
-  onSelect,
-}: {
-  node: SiteNode;
-  accent: string;
-  selected: boolean;
-  onSelect: (node: SiteNode) => void;
-}) {
-  const kindStyle = typeStyles[node.kind];
+const allNodes = (nodes: PageNode[]): PageNode[] => nodes.flatMap((node) => [node, ...(node.children ? allNodes(node.children) : [])]);
 
+const typeLabel: Record<NodeKind, string> = { Page: "Page", Template: "Template", Flow: "Flow" };
+
+function Line({ className = "" }: { className?: string }) {
+  return <span className={`wire-line ${className}`} />;
+}
+
+function WireNav() {
   return (
-    <button
-      type="button"
-      onClick={() => onSelect(node)}
-      className={`node-card group relative w-full rounded-[11px] border text-left transition duration-200 ease-out hover:-translate-y-0.5 hover:shadow-[0_14px_26px_rgba(38,47,46,0.08)] focus-visible:ring-2 focus-visible:ring-[#1F5E6B] focus-visible:ring-offset-2 ${
-        selected ? "border-[#1F5E6B] bg-[#FFFDFC] shadow-[0_12px_25px_rgba(31,94,107,0.10)]" : "border-[#DDD7CA] bg-[#FCFAF3]/95"
-      }`}
-      aria-pressed={selected}
-    >
-      <span className="absolute -left-[7px] top-7 h-3 w-3 rounded-full border-[3px] border-[#F7F3EA]" style={{ backgroundColor: accent }} />
-      <div className="flex min-h-[164px] flex-col p-5">
-        <div className="flex items-start justify-between gap-3">
-          <span className="rounded-full px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-[0.14em]" style={{ backgroundColor: kindStyle.background, color: kindStyle.foreground }}>
-            {node.kind}
-          </span>
-          <ArrowUpRight className="h-4 w-4 text-[#8A897F] transition-transform duration-200 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" aria-hidden="true" />
-        </div>
-        <h3 className="mt-5 text-[18px] font-extrabold leading-tight text-[#223336]">{node.title}</h3>
-        <p className="mt-1.5 text-[12px] font-semibold leading-relaxed text-[#68706C]">{node.template}</p>
-        <div className="mt-auto flex items-center justify-between border-t border-[#ECE7DD] pt-4 text-[11px] font-semibold text-[#77786F]">
-          <span>{node.pageCount}</span>
-          <span className="inline-flex items-center gap-1 text-[#1F5E6B]">Inspect <ChevronRight className="h-3.5 w-3.5" /></span>
-        </div>
-      </div>
-    </button>
+    <div className="wire-nav">
+      <span className="wire-mark">CAAP</span>
+      <span className="wire-nav-line" />
+      <span className="wire-nav-line short" />
+      <span className="wire-nav-line short" />
+      <span className="wire-button-sm">Donate</span>
+    </div>
   );
 }
 
-function TemplateStamp({ kind }: { kind: NodeKind }) {
-  const style = typeStyles[kind];
+function WireTitle({ label, short = false }: { label: string; short?: boolean }) {
+  return <div className="wire-title-group"><p className="wire-eyebrow">{label}</p><Line className={short ? "w-40" : "w-64"} /><Line className="w-44" /></div>;
+}
+
+function WireBlocks({ count = 3 }: { count?: number }) {
+  return <div className="wire-card-grid">{Array.from({ length: count }).map((_, index) => <div className="wire-card" key={index}><span className="wire-image" /><Line /><Line className="w-2/3" /><span className="wire-link" /></div>)}</div>;
+}
+
+function WireframePreview({
+  node,
+  device,
+  paymentMethod,
+  onPaymentMethod,
+}: {
+  node: PageNode;
+  device: "mobile" | "desktop";
+  paymentMethod: string;
+  onPaymentMethod: (method: string) => void;
+}) {
+  const displayCopy = node.clientCopy ?? "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec sed ligula in arcu facilisis tempus.";
+  const isMobile = device === "mobile";
+
+  const shell = (children: React.ReactNode) => (
+    <div className={`device-shell ${isMobile ? "device-mobile" : "device-desktop"}`}>
+      <div className="device-top"><span /><span /><span /></div>
+      <div className="wire-page">{children}</div>
+    </div>
+  );
+
+  if (node.template === "home" || node.template === "hub") {
+    return shell(<><WireNav /><section className="wire-hero"><WireTitle label={node.label} /><p className="wire-copy">{displayCopy}</p><div className="wire-cta-row"><span className="wire-button">Explore</span><span className="wire-button ghost">Learn more</span></div></section><section className="wire-section"><p className="wire-section-label">Featured pathways</p><WireBlocks count={isMobile ? 2 : 3} /></section></>);
+  }
+
+  if (node.template === "directory" || node.template === "events" || node.template === "documents") {
+    return shell(<><WireNav /><section className="wire-section"><WireTitle label={node.label} /><div className="wire-search-row"><span className="wire-search">Search</span><span className="wire-filter">Filter</span></div>{node.template === "documents" ? <div className="wire-list">{Array.from({ length: 5 }).map((_, index) => <div className="wire-list-row" key={index}><FileText size={13} /><div><Line className="w-36" /><Line className="w-20 thin" /></div><span className="wire-download">PDF</span></div>)}</div> : <WireBlocks count={isMobile ? 3 : 6} />}</section></>);
+  }
+
+  if (node.template === "people") {
+    return shell(<><WireNav /><section className="wire-section"><WireTitle label={node.label} /><div className="wire-people-grid">{Array.from({ length: isMobile ? 4 : 6 }).map((_, index) => <div className="wire-person" key={index}><span className="wire-avatar" /><Line className="w-20" /><Line className="w-14 thin" /></div>)}</div></section></>);
+  }
+
+  if (node.template === "fund") {
+    return shell(<><WireNav /><section className="wire-fund-hero"><div><p className="wire-eyebrow">Fund detail</p><h3>{node.label}</h3><p>{displayCopy}</p><span className="wire-button">Donate to this fund</span></div><span className="wire-hero-image">Hero image</span></section><section className="wire-section two-col"><div><WireTitle label="Why it matters" /><p className="wire-copy">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed at sapien vitae sem pretium porta.</p></div><div className="wire-side-box"><Line /><Line className="w-3/4" /><span className="wire-link" /></div></section></>);
+  }
+
+  if (node.template === "cart") {
+    return shell(<><WireNav /><section className="wire-section"><WireTitle label="Your gift cart" /><div className="wire-cart-list"><div className="wire-cart-item"><div><strong>Palestine Museum US</strong><small>Private note · optional</small></div><b>$100</b></div><div className="wire-cart-item"><div><strong>Jack & Bernice Shaheen Media Scholarship</strong><small>Honor gift · optional</small></div><b>$150</b></div><div className="wire-cart-item"><div><strong>Teen Grantmaking Initiative</strong><small>Public narrative · optional</small></div><b>$100</b></div></div><div className="wire-total"><span>Cart total</span><strong>$350</strong></div><span className="wire-button full">Proceed to secure payment</span></section></>);
+  }
+
+  if (node.template === "checkout") {
+    const methods = ["Credit / Debit", "ACH bank", "PayPal", "Venmo", "Cash App Pay"];
+    return shell(<><WireNav /><section className="wire-section checkout-wire"><div className="checkout-head"><div><p className="wire-eyebrow">Secure checkout</p><h3>Complete your gift</h3></div><span className="wire-total-pill">$350</span></div><div className="wire-checkout-split"><div className="wire-form-stack"><label>Contact information<Line /><Line className="w-3/4" /></label><label>Billing address<Line /><Line className="w-2/3" /></label></div><div className="wire-payment-area"><p className="wire-section-label">Choose one payment method</p><p className="wire-microcopy">One method completes every fund in this cart.</p><div className="wire-payment-options">{methods.map((method) => <button type="button" onClick={() => onPaymentMethod(method)} className={`wire-payment-method ${paymentMethod === method ? "selected" : ""}`} key={method}><span className="wire-radio" />{method}</button>)}</div><div className="wire-payment-detail"><CreditCard size={16} /><div><Line className="w-32" /><Line className="w-20 thin" /></div></div></div></div><div className="wire-checkout-footer"><span>3 designated funds</span><span className="wire-button">Donate $350</span></div></section></>);
+  }
+
+  if (node.template === "confirmation") {
+    return shell(<><WireNav /><section className="wire-confirm"><span className="wire-check">✓</span><p className="wire-eyebrow">Gift confirmed</p><h3>Thank you for your support.</h3><p>A formal acknowledgement letter will be sent to your email.</p><span className="wire-button ghost">Return to CAAP</span></section></>);
+  }
+
+  if (node.template === "service") {
+    return shell(<><WireNav /><section className="wire-service"><WireTitle label={node.label} /><p className="wire-copy">Lorem ipsum dolor sit amet, consectetur adipiscing elit. This page explains the fund type, who it serves, and the next step.</p><div className="wire-check-list"><span>○ Considerations</span><span>○ How it works</span><span>○ Speak with CAAP</span></div><span className="wire-button">Start an inquiry</span></section></>);
+  }
+
+  if (node.template === "opportunity") {
+    return shell(<><WireNav /><section className="wire-section"><div className="wire-opportunity-meta"><span>Open</span><span>Deadline: TBD</span></div><WireTitle label={node.label} /><p className="wire-copy">Lorem ipsum dolor sit amet, consectetur adipiscing elit. This area explains eligibility, benefits, required materials, and key dates.</p><div className="wire-side-box"><p className="wire-section-label">At a glance</p><Line /><Line className="w-3/4" /><Line className="w-2/3" /></div><span className="wire-button">Apply now</span></section></>);
+  }
+
+  if (node.template === "event") {
+    return shell(<><WireNav /><section className="wire-event"><WireTitle label={node.label} /><div className="wire-event-meta"><span>Date & time</span><span>Location</span><span>Tickets / sponsorships</span></div><span className="wire-hero-image wide">Event image</span><p className="wire-copy">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Event information, honorees, and participation details live here.</p><span className="wire-button">Register or purchase tickets</span></section></>);
+  }
+
+  return shell(<><WireNav /><section className="wire-section"><WireTitle label={node.label} /><p className="wire-copy">{node.template === "form" ? "Use a concise, mobile-first form with clear routing, required fields only, and an explicit next-step confirmation." : displayCopy}</p><div className="wire-form-stack"><label>Name<Line /></label><label>Email<Line /></label><label>How can we help?<span className="wire-textarea" /></label></div><span className="wire-button">Submit inquiry</span></section></>);
+}
+
+function TreeNode({
+  node,
+  depth,
+  selectedId,
+  query,
+  onOpen,
+}: {
+  node: PageNode;
+  depth: number;
+  selectedId: string;
+  query: string;
+  onOpen: (node: PageNode) => void;
+}) {
+  const [expanded, setExpanded] = useState(true);
+  const matches = query ? `${node.label} ${node.description}`.toLowerCase().includes(query) : true;
+  const childMatches = node.children?.some((child) => `${child.label} ${child.description}`.toLowerCase().includes(query)) ?? false;
+  if (query && !matches && !childMatches) return null;
+
   return (
-    <span className="inline-flex rounded-full px-3 py-1.5 text-[10px] font-extrabold uppercase tracking-[0.16em]" style={{ backgroundColor: style.background, color: style.foreground }}>
-      {kind}
-    </span>
+    <li className="tree-item">
+      <div className={`tree-row depth-${depth}`}>
+        {node.children ? <button type="button" onClick={() => setExpanded((current) => !current)} aria-label={expanded ? `Collapse ${node.label}` : `Expand ${node.label}`} className="tree-expander">{expanded || query ? <ChevronDown size={14} /> : <ChevronRight size={14} />}</button> : <span className="tree-spacer" />}
+        <button type="button" onClick={() => onOpen(node)} className={`tree-node ${selectedId === node.id ? "tree-node-selected" : ""}`}>
+          <CircleDot size={13} strokeWidth={selectedId === node.id ? 2.5 : 1.7} />
+          <span>{node.label}</span>
+          <small>{typeLabel[node.kind]}</small>
+        </button>
+      </div>
+      {node.children && (expanded || query) && <ul className="tree-children">{node.children.map((child) => <TreeNode key={child.id} node={child} depth={depth + 1} selectedId={selectedId} query={query} onOpen={onOpen} />)}</ul>}
+    </li>
   );
 }
 
 export default function Home() {
-  const [activeJourney, setActiveJourney] = useState<JourneyId | "all">("all");
-  const [expanded, setExpanded] = useState<Record<JourneyId, boolean>>({
-    learn: true,
-    open: true,
-    donate: true,
-    apply: true,
-    attend: true,
-    contact: true,
-  });
-  const [search, setSearch] = useState("");
-  const [selectedNode, setSelectedNode] = useState<SiteNode>(journeys[2].nodes[3]);
-  const [showDetails, setShowDetails] = useState(true);
+  const nodes = useMemo(() => allNodes(tree), []);
+  const [selected, setSelected] = useState<PageNode>(nodes.find((node) => node.id === "donation-checkout") ?? nodes[0]);
+  const [open, setOpen] = useState(false);
+  const [query, setQuery] = useState("");
+  const [device, setDevice] = useState<"mobile" | "desktop">("mobile");
+  const [paymentMethod, setPaymentMethod] = useState("Credit / Debit");
 
-  const query = search.trim().toLowerCase();
-  const activeJourneys = useMemo(
-    () => (activeJourney === "all" ? journeys : journeys.filter((journey) => journey.id === activeJourney)),
-    [activeJourney],
-  );
-
-  const displayedJourneys = activeJourneys
-    .map((journey) => ({
-      ...journey,
-      nodes: journey.nodes.filter((node) => {
-        if (!query) return true;
-        return `${node.title} ${node.kind} ${node.template} ${node.description} ${node.examples.join(" ")}`.toLowerCase().includes(query);
-      }),
-    }))
-    .filter((journey) => journey.nodes.length > 0);
-
-  const totalNodeCount = journeys.reduce((total, journey) => total + journey.nodes.length, 0) + foundations.length;
-
-  const selectNode = (node: SiteNode) => {
-    setSelectedNode(node);
-    setShowDetails(true);
-  };
-
-  const resetMap = () => {
-    setActiveJourney("all");
-    setSearch("");
-    setExpanded({ learn: true, open: true, donate: true, apply: true, attend: true, contact: true });
+  const selectNode = (node: PageNode) => {
+    setSelected(node);
+    setOpen(true);
+    if (node.template === "checkout" || node.template === "cart" || node.template === "form") setDevice("mobile");
   };
 
   return (
-    <main className="min-h-screen bg-[#F7F3EA] text-[#223336]">
-      <div className="map-grain pointer-events-none fixed inset-0 opacity-60" />
+    <main className="prototype-page">
+      <header className="prototype-header">
+        <div className="prototype-brand"><span className="prototype-brand-mark brand-compass" aria-hidden="true"><i /><i /><i /><i /></span><div><p>Center AAP</p><h1>Site Map</h1><small>Architecture navigator</small></div></div>
+        <div className="prototype-header-note"><MapPinned size={12} /> Follow a visitor path</div>
+      </header>
 
-      <aside className="map-key-rail relative z-20 hidden w-[320px] shrink-0 flex-col border-r border-[#DCD7CD] bg-[#FDFBF6]/95 px-7 py-8 md:fixed md:inset-y-0 md:left-0 md:flex">
-        <div>
-          <div className="flex items-center gap-3">
-            <img src="/manus-storage/caap-sitemap-compass-mark_41843878.png" alt="Compass lattice mark" className="h-12 w-12 object-contain" />
-            <div>
-              <p className="text-[10px] font-extrabold uppercase tracking-[0.19em] text-[#8B7251]">Center AAP</p>
-              <p className="font-serif text-[30px] leading-[0.86] text-[#1F5E6B]">Site Map</p>
-              <p className="mt-1.5 text-[8px] font-extrabold uppercase tracking-[0.16em] text-[#747A73]">Architecture navigator</p>
-            </div>
-          </div>
-          <div className="mt-10">
-            <p className="text-[10px] font-extrabold uppercase tracking-[0.17em] text-[#8B8176]">Map lens</p>
-            <h1 className="mt-3 font-serif text-[31px] leading-[1.05] text-[#223336]">A navigable blueprint for CAAP’s next digital home.</h1>
-            <p className="mt-4 text-[13px] leading-6 text-[#68706C]">Explore the visitor journeys, page branches, reusable templates, and transactional flows beneath the proposed architecture.</p>
-          </div>
-        </div>
+      <section className="prototype-intro">
+        <div><p className="prototype-kicker">Interactive architecture map</p><h2>Follow a visitor path.<br />See the template beneath it.</h2><p>Use the route map to orient the system, then open a page point to review its simple wireframe. The donation route demonstrates a multi-fund cart and a mobile-first checkout.</p></div>
+        <div className="prototype-rules"><span><b>Cart rule</b> One donor-selected method completes the total cart.</span><span><b>Priority flows</b> Open a Fund and Donate.</span></div>
+      </section>
 
-        <nav className="mt-10" aria-label="Journey filters">
-          <p className="mb-3 text-[10px] font-extrabold uppercase tracking-[0.17em] text-[#8B8176]">Primary journeys</p>
-          <div className="space-y-1.5">
-            <button
-              type="button"
-              onClick={() => setActiveJourney("all")}
-              className={`journey-filter w-full ${activeJourney === "all" ? "journey-filter-active" : ""}`}
-            >
-              <span className="flex h-7 w-7 items-center justify-center rounded-full bg-[#E2ECEC] text-[#1F5E6B]"><Map className="h-3.5 w-3.5" /></span>
-              <span>All routes</span>
-              <span className="ml-auto text-[10px] text-[#86877F]">6</span>
-            </button>
-            {journeys.map((journey) => {
-              const Icon = journey.icon;
-              return (
-                <button
-                  key={journey.id}
-                  type="button"
-                  onClick={() => setActiveJourney(journey.id)}
-                  className={`journey-filter w-full ${activeJourney === journey.id ? "journey-filter-active" : ""}`}
-                >
-                  <span className="flex h-7 w-7 items-center justify-center rounded-full text-white" style={{ backgroundColor: journey.color }}><Icon className="h-3.5 w-3.5" /></span>
-                  <span>{journey.name}</span>
-                  <span className="ml-auto text-[10px] text-[#86877F]">{journey.nodes.length}</span>
-                </button>
-              );
+      <section className="tree-workspace" aria-label="Center AAP information architecture tree">
+        <aside className="tree-sidebar">
+          <div className="tree-sidebar-head"><div><p className="prototype-kicker">Map inventory</p><h2>Page tree</h2></div><span>{nodes.length} points</span></div>
+          <div className="tree-search"><Search size={15} /><input value={query} onChange={(event) => setQuery(event.target.value.toLowerCase())} placeholder="Find a page" aria-label="Find a page in the information architecture" />{query && <button type="button" onClick={() => setQuery("")} aria-label="Clear search"><X size={14} /></button>}</div>
+          <ul className="tree-root">{tree.map((node) => <TreeNode key={node.id} node={node} depth={0} selectedId={selected.id} query={query} onOpen={selectNode} />)}</ul>
+        </aside>
+
+        <section className="prototype-guide">
+          <div className="guide-icon"><MapPinned size={24} /></div>
+          <p className="prototype-kicker">Route map</p>
+          <h2>Start with a visitor intention.</h2>
+          <p>Six connected routes organize the system. The tree remains a supporting inventory; the map makes the visitor journey visible first.</p>
+          <button type="button" className="map-home-node" onClick={() => selectNode(tree[0])}><span className="map-waypoint">00</span><span><b>Home</b><small>Mission-led entry point</small></span><ExternalLink size={14} /></button>
+          <div className="route-map" aria-label="Primary visitor routes">
+            {tree.filter((node) => node.id !== "home").map((node, index) => {
+              const meta = routeMeta[node.id];
+              return <button type="button" key={node.id} onClick={() => selectNode(node)} className="route-map-node" style={{ borderColor: meta.color, backgroundColor: meta.soft }}><span className="map-waypoint" style={{ backgroundColor: meta.color }}>{String(index + 1).padStart(2, "0")}</span><span className="route-map-copy"><b>{node.label}</b><small>{meta.summary}</small></span><ChevronRight size={15} /></button>;
             })}
           </div>
-        </nav>
-
-        <div className="mt-auto border-t border-[#E2DDD4] pt-6">
-          <p className="text-[10px] font-extrabold uppercase tracking-[0.17em] text-[#8B8176]">Node key</p>
-          <div className="mt-4 space-y-2.5 text-[12px] text-[#626861]">
-            {(["Hub", "Template", "Archive", "Flow", "Utility"] as NodeKind[]).map((kind) => (
-              <div key={kind} className="flex items-center gap-2.5"><TemplateStamp kind={kind} /><span>{kind === "Hub" ? "Visitor-intent landing" : kind === "Flow" ? "Application or transaction" : kind === "Archive" ? "Searchable collection" : kind === "Utility" ? "System support surface" : "Reusable page structure"}</span></div>
-            ))}
-          </div>
-        </div>
-      </aside>
-
-      <div className="relative z-10 md:pl-[320px]">
-        <header className="sticky top-0 z-30 border-b border-[#DED8CF] bg-[#FDFBF6]/90 px-5 py-4 backdrop-blur-xl sm:px-8 lg:px-10">
-          <div className="flex items-center justify-between gap-4">
-            <div className="flex items-center gap-3 lg:hidden">
-              <img src="/manus-storage/caap-sitemap-compass-mark_41843878.png" alt="Compass lattice mark" className="h-9 w-9 object-contain" />
-              <div><p className="font-serif text-[22px] leading-none text-[#1F5E6B]">CAAP Site Map</p><p className="mt-1 text-[9px] font-bold uppercase tracking-[0.14em] text-[#877C6F]">Template hierarchy</p></div>
-            </div>
-            <div className="hidden items-center gap-2 text-[11px] font-bold uppercase tracking-[0.14em] text-[#7A7F77] md:flex">
-              <Compass className="h-4 w-4 text-[#1F5E6B]" /> <span>Architecture navigator</span><span className="text-[#C4BEB3]">/</span><span className="text-[#1F5E6B]">Template hierarchy</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <button type="button" onClick={resetMap} className="hidden rounded-full border border-[#D9D2C8] bg-white px-4 py-2 text-[11px] font-extrabold uppercase tracking-[0.11em] text-[#55605C] transition hover:border-[#1F5E6B] hover:text-[#1F5E6B] sm:inline-flex">Reset map</button>
-              <button type="button" onClick={() => setShowDetails((visible) => !visible)} className="inline-flex items-center gap-2 rounded-full bg-[#1F5E6B] px-4 py-2 text-[11px] font-extrabold uppercase tracking-[0.11em] text-white transition hover:bg-[#174B55] active:scale-[0.97]">
-                <LayoutTemplate className="h-3.5 w-3.5" /> {showDetails ? "Hide detail" : "Show detail"}
-              </button>
-            </div>
-          </div>
-        </header>
-
-        <section className="hero-panel overflow-hidden px-5 pb-8 pt-8 sm:px-8 lg:px-10 lg:pt-10">
-          <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(247,243,234,0.98)_0%,rgba(247,243,234,0.90)_45%,rgba(247,243,234,0.47)_100%)]" />
-          <div className="relative max-w-4xl">
-            <div className="inline-flex items-center gap-2 rounded-full border border-[#CFC6B9] bg-[#FDFBF6]/85 px-3 py-1.5 text-[10px] font-extrabold uppercase tracking-[0.16em] text-[#736958] shadow-sm"><Map className="h-3.5 w-3.5 text-[#C18439]" /> {totalNodeCount} navigable system surfaces</div>
-            <h2 className="mt-5 max-w-3xl font-serif text-[44px] leading-[0.96] text-[#223336] sm:text-[56px]">Follow the visitor’s path.<br /><span className="text-[#1F5E6B]">See the system beneath it.</span></h2>
-            <p className="mt-5 max-w-2xl text-[15px] leading-7 text-[#57635E]">The global shell frames every page. The six route rails organize visitor intent. Select any waypoint to inspect its reusable template and the pages it supports.</p>
-          </div>
+          <div className="map-legend"><span><i className="blue" />Structure</span><span><i className="saffron" />Primary path</span><span><i className="terracotta" />Transaction</span><span><i className="sage" />Collection</span></div>
+          <button type="button" className="guide-button" onClick={() => selectNode(selected)}>Open selected: {selected.label}<ExternalLink size={15} /></button>
         </section>
+      </section>
 
-        <div className="border-b border-[#DED8CF] bg-[#FDFBF6] px-5 py-4 sm:px-8 lg:px-10">
-          <div className="flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
-            <div className="relative max-w-xl flex-1">
-              <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-[#85877F]" />
-              <input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search a page, template, or user journey" className="h-10 w-full rounded-xl border border-[#DDD7CC] bg-[#FFFDFC] pl-10 pr-10 text-[13px] font-medium text-[#263436] outline-none transition placeholder:text-[#A3A39B] focus:border-[#1F5E6B] focus:ring-4 focus:ring-[#1F5E6B]/10" />
-              {search && <button type="button" onClick={() => setSearch("")} aria-label="Clear search" className="absolute right-3 top-1/2 -translate-y-1/2 rounded-full p-1 text-[#6E756F] hover:bg-[#EFEAE1]"><X className="h-3.5 w-3.5" /></button>}
-            </div>
-            <div className="flex flex-wrap items-center gap-2 xl:hidden">
-              <span className="mr-1 text-[10px] font-extrabold uppercase tracking-[0.15em] text-[#8A8176]">Focus</span>
-              {[{ id: "all" as const, name: "All" }, ...journeys.map(({ id, name }) => ({ id, name }))].map((item) => (
-                <button key={item.id} type="button" onClick={() => setActiveJourney(item.id)} className={`rounded-full px-3 py-2 text-[11px] font-extrabold transition ${activeJourney === item.id ? "bg-[#223F45] text-white" : "bg-[#F2EEE6] text-[#6A706B] hover:bg-[#E6E0D6]"}`}>{item.name}</button>
-              ))}
-            </div>
+      <footer className="prototype-footer">Schematic planning artifact only. No payment processing occurs in this prototype.</footer>
+
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogContent showCloseButton={false} className="wire-dialog max-h-[92vh] max-w-[calc(100%-1.2rem)] overflow-hidden border-[#1E1E1E] bg-[#F2F2EE] p-0 shadow-[0_24px_80px_rgba(0,0,0,0.25)] sm:max-w-[1180px]">
+          <div className="wire-dialog-top">
+            <div><p className="prototype-kicker">{typeLabel[selected.kind]} · {selected.template} template</p><DialogTitle className="mt-1 font-mono text-xl font-bold tracking-tight text-[#181818]">{selected.label}</DialogTitle><DialogDescription className="mt-1 max-w-xl text-[12px] leading-5 text-[#555]">{selected.description}</DialogDescription></div>
+            <button type="button" onClick={() => setOpen(false)} className="wire-dialog-close" aria-label="Close wireframe"><X size={17} /></button>
           </div>
-        </div>
-
-        <div className={`grid min-w-0 transition-[grid-template-columns] duration-300 ${showDetails ? "xl:grid-cols-[minmax(0,1fr)_370px]" : "xl:grid-cols-1"}`}>
-          <div className="min-w-0 px-5 py-8 sm:px-8 lg:px-10 lg:py-10">
-            <section aria-labelledby="foundation-title" className="mb-10">
-              <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-end">
-                <div><p className="text-[10px] font-extrabold uppercase tracking-[0.17em] text-[#9A7D5A]">Layer 0 · shared system</p><h2 id="foundation-title" className="mt-1 font-serif text-[30px] text-[#223336]">The foundation every route inherits.</h2></div>
-                <p className="max-w-sm text-[12px] leading-5 text-[#6A706B]">These surfaces sit above the navigation tree and create continuity across the public experience.</p>
-              </div>
-              <div className="mt-5 grid gap-3 md:grid-cols-3">
-                {foundations.map((node) => <NodeCard key={node.id} node={node} accent="#C18439" selected={selectedNode.id === node.id} onSelect={selectNode} />)}
-              </div>
-            </section>
-
-            <section aria-labelledby="journey-map-title">
-              <div className="flex flex-col justify-between gap-4 border-t border-[#DCD5CA] pt-8 sm:flex-row sm:items-end">
-                <div><p className="text-[10px] font-extrabold uppercase tracking-[0.17em] text-[#9A7D5A]">Layers 1–6 · visitor routes</p><h2 id="journey-map-title" className="mt-1 font-serif text-[30px] text-[#223336]">Six ways into the system.</h2></div>
-                <button type="button" onClick={() => setExpanded({ learn: true, open: true, donate: true, apply: true, attend: true, contact: true })} className="inline-flex items-center gap-2 text-[11px] font-extrabold uppercase tracking-[0.12em] text-[#1F5E6B] hover:text-[#174B55]"><Maximize2 className="h-3.5 w-3.5" /> Expand all routes</button>
-              </div>
-
-              <div className="journey-canvas mt-8 space-y-5">
-                {displayedJourneys.length === 0 && (
-                  <div className="rounded-2xl border border-dashed border-[#CFC6B9] bg-[#FCFAF5] px-6 py-12 text-center"><Search className="mx-auto h-6 w-6 text-[#A89A87]" /><p className="mt-3 font-serif text-xl text-[#344447]">No matching map nodes.</p><button type="button" onClick={() => setSearch("")} className="mt-3 text-sm font-bold text-[#1F5E6B] underline underline-offset-4">Clear the search</button></div>
-                )}
-                {displayedJourneys.map((journey) => {
-                  const Icon = journey.icon;
-                  const open = expanded[journey.id] || Boolean(query);
-                  return (
-                    <section key={journey.id} className="route-section" style={{ "--route": journey.color, "--route-soft": journey.softColor } as React.CSSProperties}>
-                      <button type="button" onClick={() => setExpanded((current) => ({ ...current, [journey.id]: !current[journey.id] }))} className="route-header w-full text-left" aria-expanded={open}>
-                        <span className="route-index">{journey.glyph}</span>
-                        <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl text-white shadow-sm" style={{ backgroundColor: journey.color }}><Icon className="h-5 w-5" /></span>
-                        <span className="min-w-0 flex-1"><span className="block font-serif text-[27px] leading-none text-[#223336]">{journey.name}</span><span className="mt-1.5 block max-w-xl text-[12px] leading-5 text-[#68706C]">{journey.description}</span></span>
-                        <span className="hidden items-center gap-2 rounded-full bg-white/70 px-3 py-1.5 text-[10px] font-extrabold uppercase tracking-[0.12em] text-[#6B706B] sm:inline-flex">{journey.nodes.length} surfaces</span>
-                        <span className="flex h-8 w-8 items-center justify-center rounded-full bg-white/80 text-[#667069]">{open ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}</span>
-                      </button>
-                      {open && (
-                        <div className="route-content">
-                          <div className="route-rail" aria-hidden="true" />
-                          <div className="grid gap-3 sm:grid-cols-2 2xl:grid-cols-3">
-                            {journey.nodes.map((node) => <NodeCard key={node.id} node={node} accent={journey.color} selected={selectedNode.id === node.id} onSelect={selectNode} />)}
-                          </div>
-                        </div>
-                      )}
-                    </section>
-                  );
-                })}
-              </div>
-            </section>
-
-            <section className="relative mt-12 overflow-hidden rounded-[24px] border border-[#DAD3C7] bg-[#1F5E6B] px-6 py-8 text-white sm:px-9">
-              <img src="/manus-storage/caap-sitemap-routes_5d4fff0f.jpg" alt="Abstract connected route rails" className="absolute inset-0 h-full w-full object-cover opacity-20 mix-blend-screen" />
-              <div className="relative max-w-2xl"><p className="text-[10px] font-extrabold uppercase tracking-[0.18em] text-[#F5CD76]">Reading the map</p><h2 className="mt-2 font-serif text-[30px] leading-tight">A page belongs to a route. A template belongs to the system.</h2><p className="mt-3 text-[14px] leading-6 text-[#E5F0F0]">Select individual waypoints to separate what is a page instance from what is a reusable template, searchable archive, or transactional flow. That distinction keeps scope and maintenance clear.</p></div>
-            </section>
-          </div>
-
-          {showDetails && (
-            <aside className="detail-panel border-t border-[#DCD5CA] bg-[#FDFBF6] xl:sticky xl:top-[73px] xl:h-[calc(100vh-73px)] xl:overflow-y-auto xl:border-l xl:border-t-0">
-              <div className="p-6 sm:p-8 xl:p-7">
-                <div className="flex items-start justify-between gap-4"><div><p className="text-[10px] font-extrabold uppercase tracking-[0.17em] text-[#9A7D5A]">Selected waypoint</p><h2 className="mt-2 font-serif text-[32px] leading-none text-[#223336]">{selectedNode.title}</h2></div><button type="button" onClick={() => setShowDetails(false)} aria-label="Close detail panel" className="rounded-full border border-[#DDD7CC] p-2 text-[#657069] transition hover:bg-[#F1EDE5]"><X className="h-4 w-4" /></button></div>
-                <div className="mt-6"><TemplateStamp kind={selectedNode.kind} /><p className="mt-3 text-[13px] font-extrabold text-[#1F5E6B]">{selectedNode.template}</p></div>
-                <p className="mt-5 text-[14px] leading-7 text-[#59645F]">{selectedNode.description}</p>
-                <div className="mt-7 rounded-2xl border border-[#E1DBD1] bg-[#F7F3EA] p-5"><p className="text-[10px] font-extrabold uppercase tracking-[0.15em] text-[#8B8176]">What belongs here</p><ul className="mt-3 space-y-3">{selectedNode.examples.map((example) => <li key={example} className="flex items-start gap-2.5 text-[13px] leading-5 text-[#47544F]"><span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[#C18439]" />{example}</li>)}</ul></div>
-                <div className="mt-4 flex items-center gap-3 rounded-2xl border border-[#E1DBD1] bg-white p-4"><FileText className="h-5 w-5 text-[#1F5E6B]" /><div><p className="text-[10px] font-extrabold uppercase tracking-[0.15em] text-[#8B8176]">Scope marker</p><p className="mt-1 text-[13px] font-bold text-[#46524E]">{selectedNode.pageCount}</p></div></div>
-                {selectedNode.notes && <div className="mt-4 rounded-2xl border-l-4 border-[#C18439] bg-[#FFF4DF] px-4 py-4"><p className="text-[10px] font-extrabold uppercase tracking-[0.15em] text-[#8D6331]">Architecture note</p><p className="mt-2 text-[13px] leading-6 text-[#725E42]">{selectedNode.notes}</p></div>}
-                <div className="mt-8 border-t border-[#E5DED4] pt-6"><p className="text-[10px] font-extrabold uppercase tracking-[0.15em] text-[#8B8176]">Interaction tip</p><p className="mt-2 text-[12px] leading-5 text-[#68706C]"><MousePointer2 className="mr-1 inline h-3.5 w-3.5 text-[#1F5E6B]" />Use the route filters or search field to focus the map, then select any node to inspect its responsibility in the system.</p></div>
-              </div>
-            </aside>
-          )}
-        </div>
-      </div>
+          <div className="wire-dialog-toolbar"><div className="device-toggle" role="group" aria-label="Wireframe viewport"><button type="button" className={device === "mobile" ? "active" : ""} onClick={() => setDevice("mobile")}><Smartphone size={14} /> Mobile</button><button type="button" className={device === "desktop" ? "active" : ""} onClick={() => setDevice("desktop")}><TabletSmartphone size={14} /> Desktop</button></div><span>Low-fidelity template preview</span></div>
+          <div className="wire-dialog-body"><WireframePreview node={selected} device={device} paymentMethod={paymentMethod} onPaymentMethod={setPaymentMethod} /></div>
+          {selected.template === "checkout" && <div className="wire-dialog-note"><CreditCard size={14} /> Selected demo method: <b>{paymentMethod}</b>. In production, one method pays the entire multi-fund cart; fund designations remain attached to the order.</div>}
+        </DialogContent>
+      </Dialog>
     </main>
   );
 }
