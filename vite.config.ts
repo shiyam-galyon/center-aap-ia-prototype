@@ -206,6 +206,8 @@ function vitePluginStorageProxy(): Plugin {
 const plugins = [react(), tailwindcss(), jsxLocPlugin(), vitePluginManusRuntime(), vitePluginManusDebugCollector(), vitePluginStorageProxy()];
 
 export default defineConfig({
+  // GitHub Pages project sites are served from /<repository-name>/; local and Manus builds remain at root.
+  base: process.env.GITHUB_ACTIONS ? "/center-aap-ia-prototype/" : "/",
   plugins,
   resolve: {
     alias: {
