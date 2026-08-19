@@ -12,3 +12,5 @@
 - [ ] Verify and, if needed, obtain push access for the connected GitHub account to the shiyam-galyon repository.
 - [ ] Verify the newly granted repository access and push the final source.
 - [ ] Add a GitHub Pages deployment workflow and provide the activation step.
+- [ ] Verify public repository visibility and activate the GitHub Pages workflow.
+- [ ] Fix the GitHub Pages workflow pnpm-version conflict and rerun deployment.
