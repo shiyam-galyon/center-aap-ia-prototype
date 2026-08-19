@@ -7,3 +7,7 @@
 - [ ] Build a page-node modal with wireframe previews for every page.
 - [ ] Validate desktop and mobile interactions and production build.
 - [ ] Save a checkpoint and publish the source to a private GitHub repository.
+- [ ] Provide the user with GitHub repository creation and publishing steps.
+- [ ] Push the completed architectural-plan source to the user-provided GitHub repository.
+- [ ] Verify and, if needed, obtain push access for the connected GitHub account to the shiyam-galyon repository.
+- [ ] Verify the newly granted repository access and push the final source.
