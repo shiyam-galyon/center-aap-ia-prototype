@@ -9,3 +9,7 @@ Mobile review confirms that the architecture stacks into a readable, touch-orien
 ## Architect-plan refinement
 
 The refined prototype was reviewed at both desktop and mobile widths. On desktop, the persistent left map key provides route selection and legend support while the annotated hierarchy remains the primary plan field. On mobile, the map key is intentionally removed to protect readable linework and tap targets; the hierarchy remains legible without horizontal scrolling. The selected Donation Checkout flow remains visibly differentiated as a transactional path.
+
+## Monochrome plan revision
+
+The introductory hero band was removed. Desktop and mobile review confirm that the plan now presents as a strict black-and-white drawing: white paper field, black annotation, black structural lines, black selected states, and neutral grid linework. The page hierarchy remains readable at mobile width without horizontal scrolling.

@@ -1,5 +1,6 @@
 - [ ] Simplify the information architecture into a compact clickable tree.
 - [ ] Reduce the visual language to a sparse architect-style plan with simple click-to-open mockups.
+- [ ] Remove the hero band and convert the visible plan to strict black-and-white linework.
 - [ ] Define reusable wireframe templates and page-specific content data.
 - [ ] Demonstrate a multi-fund cart with one donor-selected payment method per checkout.
 - [ ] Make donation and fund-opening wireframes explicitly mobile-first.
