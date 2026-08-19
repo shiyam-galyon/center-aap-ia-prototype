@@ -14,3 +14,4 @@
 - [ ] Add a GitHub Pages deployment workflow and provide the activation step.
 - [ ] Verify public repository visibility and activate the GitHub Pages workflow.
 - [ ] Fix the GitHub Pages workflow pnpm-version conflict and rerun deployment.
+- [ ] Correct GitHub Pages project-path routing and verify the public root URL.
