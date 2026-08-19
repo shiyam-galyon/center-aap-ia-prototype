@@ -76,3 +76,4 @@ Use a compact four-way compass lattice: four offset diamond pathways meeting at 
 - The left rail is a persistent map key containing the project lens, route filters, legend, and compact Center AAP Site Map identity.
 - Route rails, waypoints, canvas texture, and stamps must visually lead the experience; node cards are pinned map labels rather than the dominant visual treatment.
 - The compact four-way compass lattice is paired with an explicit Center AAP Site Map wordmark in the map key and mobile header.
+- The current expression is an **Architectural Civic Plan**: sparse black-line drafting, limited annotation, and a plan-view hierarchy, with the Civic Cartography palette used only to distinguish route logic.
