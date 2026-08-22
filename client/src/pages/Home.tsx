@@ -5,6 +5,7 @@
 import { useMemo, useState } from "react";
 import { ChevronDown, ChevronRight, ExternalLink, Plus, Search, X } from "lucide-react";
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
+import { mockupRegistry, mockupUrl } from "@/content/mockupRegistry";
 
 type Template = "home" | "hub" | "editorial" | "people" | "library" | "directory" | "fund" | "cart" | "checkout" | "confirm" | "service" | "form" | "opportunity" | "event";
 type Kind = "Page" | "Template" | "Flow";
@@ -65,6 +66,8 @@ const pageMark: Record<Kind, string> = { Page: "○", Template: "□", Flow: "�
 function BlueprintLine({ short = false }: { short?: boolean }) { return <span className={`blueprint-line ${short ? "short" : ""}`} />; }
 
 function Wireframe({ node, method, setMethod }: { node: Node; method: string; setMethod: (method: string) => void }) {
+  const suppliedMockup = mockupRegistry[node.id];
+  if (suppliedMockup) return <figure className="uploaded-mockup"><img src={mockupUrl(suppliedMockup.file)} alt={suppliedMockup.alt} /><figcaption>SUPPLIED MOCKUP · {node.label.toUpperCase()}</figcaption></figure>;
   const text = node.copy ?? "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum at consequat nisi.";
   const header = <div className="mock-header"><span>CAAP</span><i /><i /><b>MENU</b></div>;
   const title = <div className="mock-title"><small>{node.kind} / {node.template}</small><h3>{node.label}</h3></div>;
@@ -115,6 +118,6 @@ export default function Home() {
       <ul className="plan-tree">{plan.slice(1).map((node) => <PlanNode node={node} key={node.id} depth={0} selected={selected.id} query={query} onOpen={openNode} />)}</ul>
     </section>
     <footer className="plan-footer"><span>CLIENT EXPLORATION ARTIFACT</span><span>NO LIVE PAYMENT PROCESSING</span><span>SELECT ANY NODE TO VIEW A TEMPLATE</span></footer>
-    <Dialog open={dialogOpen} onOpenChange={setDialogOpen}><DialogContent showCloseButton={false} className="architect-dialog max-h-[94vh] max-w-[calc(100%-1rem)] overflow-hidden p-0 sm:max-w-[960px]"><div className="dialog-top"><div><p>{selected.kind.toUpperCase()} / {selected.template.toUpperCase()}</p><DialogTitle>{selected.label}</DialogTitle><DialogDescription>{selected.note}</DialogDescription></div><button type="button" onClick={() => setDialogOpen(false)} aria-label="Close mockup"><X size={16} /></button></div><div className="mockup-stage"><div className="phone-frame"><Wireframe node={selected} method={method} setMethod={setMethod} /></div></div>{selected.template === "checkout" && <div className="dialog-foot"><Plus size={12} /> {method} is selected for this demonstration. The production cart must persist all three fund designations into the same order and receipt.</div>}</DialogContent></Dialog>
+    <Dialog open={dialogOpen} onOpenChange={setDialogOpen}><DialogContent showCloseButton={false} className="architect-dialog max-h-[94vh] max-w-[calc(100%-1rem)] overflow-hidden p-0 sm:max-w-[960px]"><div className="dialog-top"><div><p>{selected.kind.toUpperCase()} / {selected.template.toUpperCase()}</p><DialogTitle>{selected.label}</DialogTitle><DialogDescription>{selected.note}</DialogDescription></div><button type="button" onClick={() => setDialogOpen(false)} aria-label="Close mockup"><X size={16} /></button></div><div className="mockup-stage"><div className={mockupRegistry[selected.id] ? "uploaded-mockup-shell" : "phone-frame"}><Wireframe node={selected} method={method} setMethod={setMethod} /></div></div>{selected.template === "checkout" && <div className="dialog-foot"><Plus size={12} /> {method} is selected for this demonstration. The production cart must persist all three fund designations into the same order and receipt.</div>}</DialogContent></Dialog>
     </div></div></main>;
 }

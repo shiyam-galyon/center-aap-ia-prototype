@@ -17,6 +17,10 @@ body { margin: 0; min-width: 320px; background: #f6f6f2; color: #20201e; font-fa
 @media (max-width: 700px) { .plan-header { align-items: center; padding: 0.75rem 1rem; }.plan-header h1 { font-size: 14px; }.plan-scale { display: none; }.plan-intro { grid-template-columns: 1fr; gap: 1.25rem; padding: 2rem 1rem; }.plan-intro h2 { font-size: 32px; }.plan-drawing { min-height: 0; margin: 1rem; padding: 1rem; }.drawing-caption { display: grid; }.plan-root { justify-content: flex-start; margin: 2rem 0 1.3rem 1rem; }.plan-tree { padding-left: 0.85rem; }.plan-node { padding: 0.4rem; }.plan-node small { white-space: normal; }.plan-node em { display: none; }.plan-footer { display: grid; padding: 0.8rem 1rem; }.mockup-stage { min-height: 0; padding: 1rem; }.phone-frame { width: 100%; }.mock-grid { grid-template-columns: 1fr 1fr; }.dialog-top { padding: 0.85rem; }.dialog-foot { padding: 0.65rem 0.85rem; } }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; } }
 
+/* Uploaded mockups replace only the selected node's low-fidelity study, retaining the architectural plan shell. */
+.uploaded-mockup-shell { width: min(100%, 820px); overflow: hidden; border: 1.5px solid #000; background: #fff; box-shadow: 6px 6px 0 rgba(0,0,0,0.13); }
+.uploaded-mockup { margin: 0; background: #fff; }.uploaded-mockup img { display: block; width: 100%; height: auto; min-height: 180px; background: #fff; object-fit: contain; }.uploaded-mockup figcaption { border-top: 1px solid #000; padding: 0.45rem 0.6rem; color: #000; font-family: "DM Mono", monospace; font-size: 8px; letter-spacing: 0.08em; }
+
 /* Civic-plan refinements: the left rail is a compact map key, not a dashboard sidebar. */
 .plan-layout { display: grid; grid-template-columns: 210px minmax(0, 1fr); align-items: start; }
 .plan-main { min-width: 0; }

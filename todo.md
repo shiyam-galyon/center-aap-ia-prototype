@@ -5,6 +5,8 @@
 - [ ] Demonstrate a multi-fund cart with one donor-selected payment method per checkout.
 - [ ] Make donation and fund-opening wireframes explicitly mobile-first.
 - [ ] Build a page-node modal with wireframe previews for every page.
+- [ ] Design a single-file mockup registry that makes page-template replacement easy.
+- [ ] Implement registry-driven preview images and automatic GitHub Pages deployment on updates.
 - [ ] Validate desktop and mobile interactions and production build.
 - [ ] Save a checkpoint and publish the source to a private GitHub repository.
 - [ ] Provide the user with GitHub repository creation and publishing steps.
