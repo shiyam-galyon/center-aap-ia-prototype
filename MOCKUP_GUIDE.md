@@ -11,20 +11,20 @@ The site map shows the low-fidelity wireframe until a page has a supplied mockup
 
 Keep individual images below **2 MB** where possible. Export desktop mockups at roughly 1440 px wide and mobile mockups at roughly 390 px wide. The viewer preserves each supplied image’s natural proportions.
 
-## Example: replace the Donation Checkout preview
+## Example: replace the Search Our Funds preview
 
 1. In GitHub, open `client/public/mockups/` and select **Add file → Upload files**.
-2. Upload your image as `donation-checkout.png` and commit it directly to `main`.
+2. Upload your image as `search-our-funds.png` and commit it directly to `main`.
 3. Open `client/src/content/mockupRegistry.ts` and find this line:
 
 ```ts
-checkout: null,
+"search-our-funds": null,
 ```
 
 4. Replace it with:
 
 ```ts
-checkout: mockup("mockups/donation-checkout.png", "Donation checkout mobile mockup"),
+"search-our-funds": mockup("mockups/search-our-funds.png", "Search Our Funds mockup"),
 ```
 
 5. Commit the change to `main`. GitHub Pages automatically rebuilds the public site. Usually the updated mockup appears within a few minutes.
@@ -33,11 +33,11 @@ checkout: mockup("mockups/donation-checkout.png", "Donation checkout mobile mock
 
 | Area | Page IDs |
 |---|---|
-| Learn | `learn`, `about`, `history`, `staff`, `board`, `reports`, `news` |
-| Open a Fund | `open`, `daf`, `impact`, `endowed`, `scholarship-fund`, `fund-inquiry` |
-| Donate | `donate`, `find-fund`, `fund-detail`, `cart`, `checkout`, `confirmation` |
-| Apply | `apply`, `grants`, `scholarships`, `programs`, `teen`, `fellowship` |
-| Attend | `attend`, `events`, `gala`, `hundred`, `table` |
-| General | `home`, `contact` |
+| Learn About CAAP | `learn-about-caap`, `our-history`, `our-staff`, `our-advisory-board`, `reports` |
+| Open a Fund | `open-a-fund`, `donor-advised-fund`, `impact-area-fund`, `endowed-fund`, `fund-scholarships` |
+| Donate to a Cause | `donate-to-a-cause`, `search-our-funds` |
+| Apply for an Opportunity | `apply-for-an-opportunity`, `grants`, `opportunity-scholarships`, `programs`, `teen-grantmaking-initiative`, `emerging-philanthropist-fellowship` |
+| Attend an Event | `attend-an-event`, `threads-of-giving-gala`, `100-arab-americans`, `directors-table-series` |
+| General | `home` |
 
 You can assign one image to multiple entries when several pages share the same template. The original wireframe remains the fallback until an image is mapped.

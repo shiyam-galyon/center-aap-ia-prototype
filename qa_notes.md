@@ -13,3 +13,11 @@ The refined prototype was reviewed at both desktop and mobile widths. On desktop
 ## Monochrome plan revision
 
 The introductory hero band was removed. Desktop and mobile review confirm that the plan now presents as a strict black-and-white drawing: white paper field, black annotation, black structural lines, black selected states, and neutral grid linework. The page hierarchy remains readable at mobile width without horizontal scrolling.
+
+## GitHub Pages verification
+
+After the base-path routing correction and the registry update, the public GitHub Pages project URL loads the interactive Center AAP plan rather than the earlier client-side 404. The latest automatic workflow completed successfully, and the live page exposes the complete tree and page-node interactions.
+
+## Approved hierarchy registry
+
+The plan was checked at desktop and mobile widths after replacing the original scope with the user-provided reference hierarchy. The resulting map contains only five primary branches—Learn About CAAP, Open a Fund, Donate to a Cause, Apply for an Opportunity, and Attend an Event—with the approved child pages under each. The hierarchy registry supports safe future renaming, addition, removal, and nesting changes without edits to the map interface.
