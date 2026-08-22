@@ -99,7 +99,7 @@ export const hierarchy: TreeNode[] = [
 
 export const siteRoot: TreeNode = {
   id: "home",
-  label: "Center AAP",
+  label: "Home Page",
   kind: "Page",
   template: "home",
   note: "Root of the approved public-site hierarchy.",

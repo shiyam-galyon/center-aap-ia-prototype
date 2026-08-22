@@ -10,6 +10,7 @@
 - [ ] Replace the current tree with the approved six-branch hierarchy in an editable hierarchy registry.
 - [ ] Nest Teen Grantmaking Initiative and Emerging Philanthropist Fellowship under Programs.
 - [ ] Remove hierarchy descriptions, chevrons, and non-outline visual text from the map.
+- [ ] Add a Home Page tab to the editable hierarchy.
 - [ ] Validate desktop and mobile interactions and production build.
 - [ ] Save a checkpoint and publish the source to a private GitHub repository.
 - [ ] Provide the user with GitHub repository creation and publishing steps.

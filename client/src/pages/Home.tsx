@@ -55,7 +55,7 @@ export default function Home() {
   return <main className="architect-plan"><div className="plan-layout plan-layout-minimal">
     <div className="plan-main">
     <section className="plan-drawing">
-      <div className="plan-root"><button type="button" onClick={() => openNode(siteRoot)}>CENTER AAP</button></div>
+      <div className="plan-root"><button type="button" onClick={() => openNode(siteRoot)}>{siteRoot.label}</button></div>
       <ul className="plan-tree">{hierarchy.map((node) => <PlanNode node={node} key={node.id} depth={0} selected={selected.id} onOpen={openNode} />)}</ul>
     </section>
     <Dialog open={dialogOpen} onOpenChange={setDialogOpen}><DialogContent showCloseButton={false} className="architect-dialog max-h-[94vh] max-w-[calc(100%-1rem)] overflow-hidden p-0 sm:max-w-[960px]"><div className="dialog-top"><div><DialogTitle>{selected.label}</DialogTitle><DialogDescription className="sr-only">Page mockup</DialogDescription></div><button type="button" onClick={() => setDialogOpen(false)} aria-label="Close mockup"><X size={16} /></button></div><div className="mockup-stage"><div className={mockupRegistry[selected.id] ? "uploaded-mockup-shell" : "phone-frame"}><Wireframe node={selected} method={method} setMethod={setMethod} /></div></div>{selected.template === "checkout" && <div className="dialog-foot"><Plus size={12} /> {method} is selected for this demonstration. The production cart must persist all three fund designations into the same order and receipt.</div>}</DialogContent></Dialog>
