@@ -23,3 +23,7 @@ After the base-path routing correction and the registry update, the public GitHu
 The plan was checked at desktop and mobile widths after replacing the original scope with the user-provided reference hierarchy. The resulting map contains only five primary branches—Learn About CAAP, Open a Fund, Donate to a Cause, Apply for an Opportunity, and Attend an Event—with the approved child pages under each. The hierarchy registry supports safe future renaming, addition, removal, and nesting changes without edits to the map interface.
 
 The cache-busted public GitHub Pages URL was checked after the automatic deployment. It displays the approved five-branch hierarchy with 22 plotted page nodes and does not include the removed pages or flows.
+
+## Hierarchy-only visual revision
+
+The map was simplified to page labels, node marks, and structural linework only. Descriptions, chevrons, navigation rail, legend labels, search, headers, and footer copy were removed from the plan canvas while node click interactions remain available. Desktop review confirms that the reduced outline is centered and uses the full drawing canvas rather than collapsing into the former sidebar width.

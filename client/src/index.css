@@ -21,6 +21,9 @@ body { margin: 0; min-width: 320px; background: #f6f6f2; color: #20201e; font-fa
 .uploaded-mockup-shell { width: min(100%, 820px); overflow: hidden; border: 1.5px solid #000; background: #fff; box-shadow: 6px 6px 0 rgba(0,0,0,0.13); }
 .uploaded-mockup { margin: 0; background: #fff; }.uploaded-mockup img { display: block; width: 100%; height: auto; min-height: 180px; background: #fff; object-fit: contain; }.uploaded-mockup figcaption { border-top: 1px solid #000; padding: 0.45rem 0.6rem; color: #000; font-family: "DM Mono", monospace; font-size: 8px; letter-spacing: 0.08em; }
 
+/* Hierarchy-only revision: all visible interface text is a page label or a selected-page mockup. */
+.plan-layout-minimal { display: block; }.plan-layout-minimal .plan-drawing { max-width: 980px; min-height: 0; margin: clamp(2rem, 8vw, 6rem) auto; padding: clamp(1rem, 4vw, 3rem); }.plan-layout-minimal .plan-root { margin: 0 0 2rem; }.plan-layout-minimal .plan-root button { padding: 0.55rem 0.8rem; }.plan-layout-minimal .plan-node { min-height: 34px; padding: 0.38rem 0.55rem; }.plan-layout-minimal .plan-node b { font-size: 12px; }.plan-layout-minimal .plan-node small, .plan-layout-minimal .plan-node em { display: none; }.plan-layout-minimal .plan-node > span:nth-child(2) { display: inline; }.plan-layout-minimal .plan-expand { width: 20px; flex-basis: 20px; }.plan-layout-minimal .plan-branch { margin-top: 0.15rem; margin-bottom: 0.4rem; }.plan-layout-minimal .plan-node::before { left: -1.38rem; width: 1.25rem; }.plan-layout-minimal .dialog-top h2 { font-family: "Manrope", sans-serif; font-size: 14px; font-weight: 700; letter-spacing: 0; }.plan-layout-minimal .mock-title small { display: none; }
+
 /* Civic-plan refinements: the left rail is a compact map key, not a dashboard sidebar. */
 .plan-layout { display: grid; grid-template-columns: 210px minmax(0, 1fr); align-items: start; }
 .plan-main { min-width: 0; }
@@ -63,3 +66,6 @@ body, .architect-plan, .map-rail, .plan-header, .plan-footer, .dialog-top, .dial
 .plan-tree > li > .plan-row .plan-mark, .plan-tree > li .plan-mark { color: #000000 !important; }
 .rail-routes button, .rail-routes button:nth-of-type(n) { border-left-color: #000000 !important; color: #000000 !important; }
 .plan-header h1, .rail-brand h1, .plan-intro h2 { color: #000000 !important; }
+
+/* Keep the stripped-back outline centered and wide after the desktop map-rail rules. */
+.plan-layout.plan-layout-minimal { display: block; }.plan-layout-minimal .plan-main { width: 100%; }.plan-layout-minimal .plan-drawing { width: min(980px, calc(100% - 2rem)); box-sizing: border-box; margin: clamp(2rem, 8vw, 6rem) auto; }
