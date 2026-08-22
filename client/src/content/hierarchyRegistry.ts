@@ -70,9 +70,17 @@ export const hierarchy: TreeNode[] = [
     children: [
       { id: "grants", label: "Grants", kind: "Page", template: "opportunity", note: "Grant opportunity listing." },
       { id: "opportunity-scholarships", label: "Scholarships", kind: "Page", template: "opportunity", note: "Scholarship opportunity listing." },
-      { id: "programs", label: "Programs", kind: "Page", template: "opportunity", note: "Program opportunity listing." },
-      { id: "teen-grantmaking-initiative", label: "Teen Grantmaking Initiative", kind: "Page", template: "opportunity", note: "Initiative opportunity page." },
-      { id: "emerging-philanthropist-fellowship", label: "Emerging Philanthropist Fellowship", kind: "Page", template: "opportunity", note: "Fellowship opportunity page." },
+      {
+        id: "programs",
+        label: "Programs",
+        kind: "Page",
+        template: "opportunity",
+        note: "Program opportunity listing.",
+        children: [
+          { id: "teen-grantmaking-initiative", label: "Teen Grantmaking Initiative", kind: "Page", template: "opportunity", note: "Initiative opportunity page." },
+          { id: "emerging-philanthropist-fellowship", label: "Emerging Philanthropist Fellowship", kind: "Page", template: "opportunity", note: "Fellowship opportunity page." },
+        ],
+      },
     ],
   },
   {

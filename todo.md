@@ -8,6 +8,7 @@
 - [ ] Design a single-file mockup registry that makes page-template replacement easy.
 - [ ] Implement registry-driven preview images and automatic GitHub Pages deployment on updates.
 - [ ] Replace the current tree with the approved six-branch hierarchy in an editable hierarchy registry.
+- [ ] Nest Teen Grantmaking Initiative and Emerging Philanthropist Fellowship under Programs.
 - [ ] Validate desktop and mobile interactions and production build.
 - [ ] Save a checkpoint and publish the source to a private GitHub repository.
 - [ ] Provide the user with GitHub repository creation and publishing steps.
